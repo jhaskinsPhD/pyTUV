@@ -1,0 +1,52 @@
+'J1',double(dat.TUV_J1);,...,% O3+ hv =>  O1D
+'J2',double(dat.TUV_J2);,...,% O3 + hv =>  O
+'J3',double(dat.TUV_J3);,...,% H2O2 + hv =>  2 OH
+'J4',double(dat.TUV_J4);,...,% NO2+ hv =>  NO + O
+'J5',double(dat.TUV_J5);,...,% NO3 + hv =>  NO
+'J6',double(dat.TUV_J6);,...,% NO3+ hv =>  NO2 + O
+'J7',double(dat.TUV_J7);,...,% HONO + hv =>  OH + NO 
+'J8',double(dat.TUV_J8);,...,% HNO3 + hv =>  OH + NO2 
+'J11',double(dat.TUV_J11);,...,% HCHO + hv =>  H + HCO
+'J12',double(dat.TUV_J12);,...,% HCHO + hv =>  H2 + CO
+'J13',double(dat.TUV_J13);,...,% CH3CHO + hv =>   CH3O2 + HO2 + CO
+'J14',double(dat.TUV_J14);,...,% C2H5CHO + hv =>  C2H5O2 + HO2 + CO
+'J18',double(dat.TUV_J18);,...,% MACR+hv->CH2CCH3+HCO
+'J21',double(dat.TUV_J21);,...,% CH3COCH3+ hv => 
+'J22',double(dat.TUV_J22);,...,% MEK+ hv => 
+'J23',double(dat.TUV_J23);,...,% MVK + hv => CH3CHCH2 + CO
+'J31',double(dat.TUV_J31);,...,% GLYOX + hv =>  2CO + H2
+'J32',double(dat.TUV_J32);,...,% GLYOX + hv =>  HCHO + CO
+'J33',double(dat.TUV_J33);,...,% GLYOX + hv =>  2HCO
+'J34',double(dat.TUV_J34);,...,% MGLYOX+ hv => 
+'J35',double(dat.TUV_J35);,...,% BIACET+ hv => 
+'J41',double(dat.TUV_J41);,...,% CH3OOH + hv =>  CH3O + OH 
+'J51',double(dat.TUV_J51);,...,% CH3NO3 + hv =>  CH3O + NO2
+'J52',double(dat.TUV_J52);,...,% C2H5NO3+ hv => Products
+'J53',double(dat.TUV_J53);,...,% NC3H7NO3+hv->Products
+'J54',double(dat.TUV_J54);,...,% IC3H7NO3+hv->Products
+'J55',double(dat.TUV_J55);,...,% TC4H9NO3+hv->Products
+'J56',double(dat.TUV_J56);,...,% NOA + hv =>  CH3COCH2O + NO2
+'Jn16',double(dat.TUV_Jn16);,...,% CH3O2NO2 (MPN) ->CH3OO+NO2
+'Jn19',double(dat.TUV_Jn19);,...,% N2O5 => NO3 + NO2
+'Jn20',double(dat.TUV_Jn20);,...,% N2O5 => NO3 + NO + O(3P)
+'Jn21',double(dat.TUV_Jn21);,...,% HNO4 => HO2 + NO2
+'Jn23',double(dat.TUV_Jn23);,...,% ClNO2 => Cl + NO2
+'Jn24',double(dat.TUV_Jn24);,...,% Br2 => Br + Br
+'Jn25',double(dat.TUV_Jn25);,...,% BrO => Br + O
+'Jn26',double(dat.TUV_Jn26);,...,% HOBr => OH + Br
+'Jn28',double(dat.TUV_Jn28);,...,% BrONO2 => Br + NO3
+'Jn29',double(dat.TUV_Jn29);,...,% BrONO2 => BrO + NO2
+'Jn30',double(dat.TUV_Jn30);,...,% CHBr3 => Products
+'Jn31',double(dat.TUV_Jn31);,...,% Cl2 => Cl + Cl
+'Jn31',double(dat.TUV_Jn31);,...,% BrCl => Br + Cl
+'Jn34',double(dat.TUV_Jn34);,...,% ClONO2 => Cl + NO3
+'Jn35',double(dat.TUV_Jn35);,...,% ClONO2 => ClO + NO2
+'Jn36',double(dat.TUV_Jn36);,...,% HOCl => HO + Cl
+'Jn37',double(dat.TUV_Jn37);,...,% OClO => Products
+'Jn38',double(dat.TUV_Jn38);,...,% ClOOCl => Cl + ClOO
+'Jn39',double(dat.TUV_Jn39);,...,% ClOO => Products
+'Jn40',double(dat.TUV_Jn40);,...,% I2 => I + I
+'Jn41',double(dat.TUV_Jn41);,...,% IOH => I + OH
+'Jn42',double(dat.TUV_Jn42);,...,% IO => I + O
+'Jn53',double(dat.TUV_Jn53);,...,% NOCl => NO + Cl
+'Jn54',double(dat.TUV_Jn54);,...,% ClONO => Cl + NO2
