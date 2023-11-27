@@ -1,0 +1,131 @@
+TUV inputs:
+==================================================================
+inpfil =      usrinp   outfil =      usrout   nstr =             4
+lat =         40.734   lon =       -111.872   tmzone =        -0.6
+iyear =         2021   imonth =           6   iday =             3
+zstart =       0.306   zstop =      119.306   nz =             119
+wstart =     120.000   wstop =      730.000   nwint =         -156
+tstart =       0.000   tstop =       23.500   nt =              48
+lzenit =           F   alsurf =       0.300   psurf =       -999.0
+o3col =      300.000   so2col =       0.000   no2col =       0.000
+taucld =       0.000   zbase =        4.000   ztop =         5.000
+tauaer =       0.235   ssaaer =       0.990   alpha =        1.000
+dirsun =       1.000   difdn =        1.000   difup =        0.000
+zout =         1.306   zaird =   -9.990E+02   ztemp =     -999.000
+lirrad =           F   laflux =           F   lmmech =           F
+lrates =           F   isfix =            0   nms =              0
+ljvals =           T   ijfix =            0   nmj =             52
+iwfix =            0   itfix =            0   izfix =            0
+==================================================================
+==== Spectral weighting functions used:
+==== Photolysis reactions used:
+T  1 O3 -> O2 + O(1D)                                  
+T  2 O3 -> O2 + O(3P)                                  
+T  3 H2O2 -> 2 OH                                      
+T  4 NO2 -> NO + O(3P)                                 
+T  5 NO3 -> NO + O2                                    
+T  6 NO3 -> NO2 + O(3P)                                
+T  7 N2O5 -> NO3 + NO + O(3P)                          
+T  8 N2O5 -> NO3 + NO2                                 
+T  9 HNO2 -> OH + NO                                   
+T 10 HNO3 -> OH + NO2                                  
+T 11 HNO4 -> HO2 + NO2                                 
+T 12 CH2O -> H + HCO                                   
+T 13 CH2O -> H2 + CO                                   
+T 14 CH3CHO -> CH3 + HCO                               
+T 15 C2H5CHO -> C2H5 + HCO                             
+T 16 CH3OOH -> CH3O + OH                               
+T 17 CH3ONO2 -> CH3O + NO2                             
+T 18 CH3(OONO2) -> CH3(OO) + NO2                       
+T 19 C2H5ONO2 -> C2H5O + NO2                           
+T 20 n-C3H7ONO2 -> C3H7O + NO2                         
+T 21 CH3CHONO2CH3 -> CH3CHOCH3 + NO2                   
+T 22 CH3COCH2(ONO2) -> CH3COCH2(O.) + NO2              
+T 23 C(CH3)3(ONO2) -> C(CH3)3(O.) + NO2                
+T 24 CH2=C(CH3)CHO -> Products                         
+T 25 CH3COCH=CH2 -> Products                           
+T 26 CH3COCH3 -> CH3CO + CH3                           
+T 27 CH3COCH2CH3 -> CH3CO + CH2CH3                     
+T 28 CHOCHO -> HCO + HCO                               
+T 29 CHOCHO -> H2 + 2CO                                
+T 30 CHOCHO -> CH2O + CO                               
+T 31 CH3COCHO -> CH3CO + HCO                           
+T 32 CH3COCOCH3 -> Products                            
+T 33 Cl2 -> Cl + Cl                                    
+T 34 ClOO -> Products                                  
+T 35 OClO -> Products                                  
+T 36 ClOOCl -> Cl + ClOO                               
+T 37 HOCl -> HO + Cl                                   
+T 38 NOCl -> NO + Cl                                   
+T 39 ClNO2 -> Cl + NO2                                 
+T 40 ClONO -> Cl + NO2                                 
+T 41 ClONO2 -> Cl + NO3                                
+T 42 ClONO2 -> ClO + NO2                               
+T 43 Br2 -> Br + Br                                    
+T 44 BrO -> Br + O                                     
+T 45 HOBr -> OH + Br                                   
+T 46 BrONO2 -> BrO + NO2                               
+T 47 BrONO2 -> Br + NO3                                
+T 48 BrCl -> Br + Cl                                   
+T 49 CHBr3 -> Products                                 
+T 50 I2 -> I + I                                       
+T 51 IO -> I + O                                       
+T 52 IOH -> I + OH                                     
+==================================================================
+ Discrete ordinates            4 -stream radiative transfer
+ air temperature: USSA, 1976
+ air concentrations: USSA, 1976
+ ozone profile: USSA, 1976
+ DATAE1/SUN/susim_hi.flx
+ DATAE1/SUN/atlas3_1994_317_a.dat        
+ DATAE1/SUN/neckel.flx                   
+ DATAE1/SUN/sao2010.solref.converted     
+ aerosols:  Elterman (1968) continental profile
+step =    1 sza =    66.524 Earth-sun factor =  0.9719858
+step =    2 sza =    72.076 Earth-sun factor =  0.9719792
+step =    3 sza =    77.519 Earth-sun factor =  0.9719737
+step =    4 sza =    82.818 Earth-sun factor =  0.9719681
+step =    5 sza =    87.935 Earth-sun factor =  0.9719619
+step =    6 sza =    92.827 Earth-sun factor =  0.9719563
+step =    7 sza =    97.447 Earth-sun factor =  0.9719508
+step =    8 sza =   101.736 Earth-sun factor =  0.9719442
+step =    9 sza =   105.634 Earth-sun factor =  0.9719387
+step =   10 sza =   109.071 Earth-sun factor =  0.9719335
+step =   11 sza =   111.970 Earth-sun factor =  0.9719268
+step =   12 sza =   114.261 Earth-sun factor =  0.9719214
+step =   13 sza =   115.873 Earth-sun factor =  0.9719159
+step =   14 sza =   116.753 Earth-sun factor =  0.9719095
+step =   15 sza =   116.870 Earth-sun factor =  0.9719040
+step =   16 sza =   116.220 Earth-sun factor =  0.9718986
+step =   17 sza =   114.826 Earth-sun factor =  0.9718921
+step =   18 sza =   112.736 Earth-sun factor =  0.9718866
+step =   19 sza =   110.015 Earth-sun factor =  0.9718811
+step =   20 sza =   106.734 Earth-sun factor =  0.9718748
+step =   21 sza =   102.969 Earth-sun factor =  0.9718693
+step =   22 sza =    98.791 Earth-sun factor =  0.9718637
+step =   23 sza =    94.266 Earth-sun factor =  0.9718573
+step =   24 sza =    89.451 Earth-sun factor =  0.9718519
+step =   25 sza =    84.397 Earth-sun factor =  0.9718466
+step =   26 sza =    79.149 Earth-sun factor =  0.9718400
+step =   27 sza =    73.746 Earth-sun factor =  0.9718348
+step =   28 sza =    68.222 Earth-sun factor =  0.9718293
+step =   29 sza =    62.612 Earth-sun factor =  0.9718229
+step =   30 sza =    56.948 Earth-sun factor =  0.9718174
+step =   31 sza =    51.266 Earth-sun factor =  0.9718122
+step =   32 sza =    45.608 Earth-sun factor =  0.9718056
+step =   33 sza =    40.031 Earth-sun factor =  0.9718003
+step =   34 sza =    34.615 Earth-sun factor =  0.9717948
+step =   35 sza =    29.489 Earth-sun factor =  0.9717884
+step =   36 sza =    24.869 Earth-sun factor =  0.9717832
+step =   37 sza =    21.120 Earth-sun factor =  0.9717776
+step =   38 sza =    18.795 Earth-sun factor =  0.9717713
+step =   39 sza =    18.451 Earth-sun factor =  0.9717661
+step =   40 sza =    20.193 Earth-sun factor =  0.9717605
+step =   41 sza =    23.555 Earth-sun factor =  0.9717541
+step =   42 sza =    27.945 Earth-sun factor =  0.9717489
+step =   43 sza =    32.938 Earth-sun factor =  0.9717434
+step =   44 sza =    38.276 Earth-sun factor =  0.9717370
+step =   45 sza =    43.810 Earth-sun factor =  0.9717318
+step =   46 sza =    49.447 Earth-sun factor =  0.9717265
+step =   47 sza =    55.124 Earth-sun factor =  0.9717201
+step =   48 sza =    60.795 Earth-sun factor =  0.9717146

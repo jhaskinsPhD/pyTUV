@@ -24,15 +24,20 @@ def get_my_relative_paths():
             
     paths=dict({'TUV_Template_Info_DF.xlsx':   os.path.join(pyTUV_path, 'Input_Data/TUV_Template_Info_DF.xlsx'),
                 'TUV_to_MCM_J_mapping.xlsx':   os.path.join(pyTUV_path, 'Input_Data/TUV_to_MCM_J_mapping.xlsx'),
-                'TUV_InputFile_Template':          os.path.join(pyTUV_path, 'Input_Data/TUV_InputFile_Template'),
-                'Outputs':                     os.path.join(pyTUV_path, 'Outputs/' )}) 
+                'TUV_InputFile_Template':      os.path.join(pyTUV_path, 'Input_Data/TUV_InputFile_Template'),
+                'Example1_Inputs':             os.path.join(pyTUV_path, 'Examples/Example1/TUV_InputFiles/'),
+                'Example1_Outputs':            os.path.join(pyTUV_path, 'Examples/Example1/TUV_OutputFiles/'),
+                'Example2_Inputs':             os.path.join(pyTUV_path, 'Examples/Example2/TUV_InputFiles/'),
+                'Example2_Outputs':            os.path.join(pyTUV_path, 'Examples/Example2/TUV_OutputFiles/'),
+                }) 
     
     # Check that all the stuff in paths exists.. pops an error if not! 
     for key in list(paths.keys()): 
         file= check_filename(paths[key], return_full=True)
     
     return paths 
-        
+  
+      
 def _parse_filename(filename, quiet:bool=True): 
     """Function to take some input string of a filename and seperate it into its 
     path, extension, and actual name. Helper function for check_filename().
@@ -298,6 +303,7 @@ def check_filename(filename:str='', default_name:str= '', ext:str='',
           # os.path.join() adds it for us when we make fullname...  
         return [opath+'/', just_file]
 
+
 def get_TUV_input_info(info_only:bool=True, print_info:bool=True):
     """Helper function to read in all the info about allowed TUV Input Vars. 
     If info_only is passed, only info relevant to users is passed back, otherwise, 
@@ -351,6 +357,7 @@ def get_TUV_input_info(info_only:bool=True, print_info:bool=True):
             print('    Description= {}'.format(allowed_vars[var]['Description'])+'\n')
             
     return allowed_vars
+
 ###############################################################################
 # 2 - Helper Functions used in check_inputs() called within function write_TUV_input_file()  
 ###############################################################################
@@ -530,6 +537,7 @@ def get_and_set_lims(variable_changes):
     
     return allowed_vars
 
+
 def bound_err(cvar:str, value, allowed, gt_gteq:str,extra_allowed:list=list([])): 
     """Wrapper function to format bounding error messages called in check_inputs()"""
     err= 'Input value for "'+cvar+'" must be '+gt_gteq+' '+str(allowed)+'. You entered: '+cvar+' = '+str(value)
@@ -572,6 +580,83 @@ def format_scientific_notation(template, new_value):
     new_formatted = template_mantissa_format.format(float(new_mantissa)*multiply) + 'E' + template_exponent_format.format(int(new_exponent)-exp_minus)
 
     return new_formatted
+
+
+def make_n_check_input_filename(lines, savepath:str, overwrite:bool=False):
+    """Helper function called in write_TUV_input_file" to create an input filename 
+        of the form 'inp_YYYY_MM_DD_offsetHRpointFRAC' denoting the file date & UTC offset
+        used in the TUV calculation to make the TUV input filename that is used to assign
+        a corresponding TUV output file (once rune) and used to make reading in that output 
+        easier! 
+       
+       INPUT: 
+       -------             
+           (1) lines - LIST of lines you think you want to write to a TUV inputfile 
+                       generated before call to this function in write_TUV_input_file(). 
+           
+           (2) savepath - STR containing path where youd like to save the input TUV files generated 
+           
+           (3) overwrite - BOOL indicating whether to overwrite file if it exists already or create a new file 
+           
+       OUTPUT: 
+       -------
+          (1) Updated output_file name that now includes a string like 'offset_neg7' 
+                (for 'tmzone=-7.0'), 'offset_pos0' (for 'tmzone=0.0') or 
+                'offset_pos1point3' (for 'tmzone=1.3') that removes things like '.' and '-'
+                from the line where the tmzone is set so it wont mess up the filename! 
+                
+    """ 
+    date_str= '' # Create empty string first so we know if we couldn't figure them out from 'lines'! 
+    tmz_str='' 
+    
+    # Loop over all lines you want to write: 
+    for line in lines.copy(): 
+        if 'iyear =' in line and 'imonth =' in line and 'iday =' in line: 
+            # Split the line into 3 chunks of 20 char len variable definitions, each seperated by 3 spaces! 
+            year=line[0:20].split('iyear =')[1].replace(' ','').replace('\n', '')
+            month=line[23:43].split('imonth =')[1].replace(' ','') .replace('\n' ,'')
+            day=line[46:66].split('iday =')[1].replace(' ','') .replace('\n', '')
+            date_str= str(year)+'_'+str(month).zfill(2)+'_'+str(day).zfill(2) 
+        
+        ############ GET AND CREATE UTC OFFSET STRING TO USE IN FILENAME: 
+        if 'tmzone =' in line:# line looks like: 'lat =  40.734   lon =  -111.872   tmzone =  -7.0' 
+            # Split line and get only timzone value , no spaces: 
+            tmz=line.split('tmzone =')[1].replace(' ','').replace('\n', '')
+        
+            # Figure out the "sign" of the UTC offset 
+            sign='neg' if np.float64(tmz) < 0 else 'pos'
+            
+            # Remove negative char is sign is neg! 
+            if sign =='neg': tmz=tmz.replace('-','')
+            
+            # Get just the "hour" of the offset (no decimals) 
+            hr=tmz.split('.')[0] if '.' in tmz else tmz 
+            
+            # Get the values after the decimal if not an integer: 
+            remainder= '' if np.mod(np.float64(tmz),1)==0 else 'point'+tmz.split('.')[1]
+            
+            # Splice it all togther into a descriptive string. 
+            tmz_str='offset_'+str(sign)+str(hr)+str(remainder)    
+
+    if tmz_str =='': # Didn't find UTC offset in lines... so error out! 
+        raise ValueError('Could not find a UTC offset in lines to write to file to use in filename! \n'+
+                         'Something is wrong with the template file or write_TUV_input_file() function \n'+ 
+                         'because it should appear regardless of if you passed it in the changes dict!').with_traceback(sys.exc_info()[2]) 
+    if date_str =='': # Didn't find date in lines... so error out! 
+        raise ValueError('Could not find year, month, & day in lines to write to file to use in filename! \n'+
+                         'Something is wrong with the template file or write_TUV_input_file() function \n'+ 
+                         'because it should appear regardless of if you passed it in the changes dict! ').with_traceback(sys.exc_info()[2]) 
+    
+    # Join it all together to make the input file name: 
+    inp_fname= str('inp_'+str(date_str)+'_'+str(tmz_str))
+        
+    # Check that the output directory exists, and whether a file with that inp_fname
+    # already exists or not... with option to update the name if so to either overwrite 
+    # that file or append a new version # to that file to distinguish it from previous versions... 
+    inp_filename=check_filename(filename=inp_fname, ext='no_ext', savepath=savepath, # Note: TUV inputs must have NO EXTENSION! 
+                                overwrite=overwrite, return_full=True)
+    
+    return inp_filename
 
 ###############################################################################
 # 4 -Main Functions that are called within wrapper functions in pyTUV.py
@@ -681,14 +766,17 @@ def check_inputs(variable_changes, j_options):
     # Create an ORDERED DICTIONARY where keys appear in order corresponding to line nos they appear on in template file. 
     var_changes = OrderedDict({key: variable_changes[key] for key in key_order if key in list(variable_changes.keys())})
     
-    return allowed_vars, var_changes,j_rxns_to_calc
-
-
-def write_TUV_input_file(variable_changes, j_rxns, output_file:str='', verbose:bool=True):
+    return allowed_vars, var_changes,j_rxns_to_calc       
+  
+    
+def write_TUV_input_file(variable_changes, j_rxns,savepath:str, overwrite:bool=False, verbose:bool=True):
     """Function to read in the template file, change the vars in 'variable_changes', 
     turn on the J-value calculations for rxns in 'j_rxns' and write a new TUV 
-    input file accordingly to 'output_file'""" 
+    input file at savepath named something like 'inp_YYYY_MM_DD_offset_HRpointFRC' in default format expected
+    by the TUV bash script that runs files and the TUV reader that reads in those TUV output files. 
     
+    NOTE: DO NOT CHANGE THE FILENAMES otherwise bash script that runs TUV & the python TUV output readers won't work. 
+    """ 
     # Get a list of ALL photolysis reactions in the template file: 
     js= build_jmapping_dict(only_MCM_Js=False, return_reverse=False)
     allowed_rxns=list(js.keys()) # has NO SPACES!
@@ -699,7 +787,7 @@ def write_TUV_input_file(variable_changes, j_rxns, output_file:str='', verbose:b
     # Read in the template file
     with open(paths['TUV_InputFile_Template'], 'r') as infile:
         lines = infile.readlines()
-            
+    
     # Modify the values based on the provided changes
     for i, line in enumerate(lines):
         ######################################################################################################
@@ -787,19 +875,24 @@ def write_TUV_input_file(variable_changes, j_rxns, output_file:str='', verbose:b
             elif rxn in line.replace(' ', '') and rxn not in j_rxns: # if the rxn is on the line but its NOT one to change... 
                 line ='F'+line[1:]  # Then set it to "False" and don't calc it! 
         lines[i]=line # Update "Lines" so stuff is actually written to output file! 
-                      
+    
     ###########################################################################
     # Write the actual TUV input File: 
     ###########################################################################
+    # Parse all lines after all changes and extract date/tmzone offset to create the EXPECTED TUV inputfile name 
+    # (used to make outputfile name in bash script when running TUV) & to make reading in the output files easier! 
+    input_filename = make_n_check_input_filename(lines, savepath=savepath, overwrite=overwrite)
     
     # Now write the lines to the new output file! 
-    with open(output_file, 'w') as outfile:
-        outfile.writelines(lines)
+    ff=open(input_filename, 'w')
+    for line in lines: 
+        ff.write(line)
+    ff.close() # Close the new inputfile
             
     # Tell the people where you saved their file! 
-    if verbose is True: print('Output File Saved at: '+output_file)
+    if verbose is True: print('New TUV Input File Saved at: '+input_filename)
     
-    return     
+    return input_filename    
 
 ###############################################################################
 # 5 - Helper Functions used exclusively in function make_TUV_input_file_daterange() in pyTUV.py
@@ -816,4 +909,65 @@ def get_value_at_index(data_dict, index):
             selected_values[key] = None  # Or any default value you prefer
     
     return selected_values
+
+###############################################################################
+# 6 - Helper Functions used in reading TUV output files in pyTUV.py
+###############################################################################
+def get_date_and_UTC_offset_from_filename(filename): 
+    """Helper function called in read_single_TUV_output_file to extract the UTC 
+        offset of the calculation to turn fractional hours into pandas datetime objects in LOCAL TIME.
+        Basically undoes what format_UTC_offset() does in write_TUV_output_file(). Requires: import re! """ 
+        
+    # Output filenames are formatted like this (what this function's input for 'filename" should contain) 
+    #    '/some/path/to/out_2022_08_13_offset_neg7point13.txt' OR  
+    #    '/some/path/to/out_2022_08_13_offset_neg7point13_v2.txt' if overwrite = False: 
+        
+    pattern = re.compile(r'out_(\d{4})_(\d{2})_(\d{2})_offset_(neg|pos)?(\d+)(?:point(\d+))?(?:_v(\d+))?.txt$')
+    match = pattern.search(filename)
+    if match:
+        year, month, day, sign, hour, fraction, version = match.groups()
+        offset = f"{'' if sign == 'pos' else '-'}{hour}"
+        if fraction:
+            offset += f".{''.join(fraction)}"
+    
+        return pd.to_datetime(year+month+day,format='%Y%m%d') , np.float64(offset)
+
+    else:
+        raise ValueError("Could not extract date/UTC offset from TUV output filename. It should be formatted like one of these: \n"+
+                         "    filename= '/some/path/out_2022_08_13_offset_pos0.txt' ouptputting date='2022/08/13', offset='0'\n"+ 
+                         "    filename= '/some/path/out_2022_08_13_offset_neg5.txt' ouptputting same date, offset='-5'\n"+ 
+                         "    filename= '/some/path/out_2022_08_13_offset_neg7point13.txt' ouptputting same date and offset='-7.13'\n"+ 
+                         "    filename= '/some/path/out_2022_08_13_offset_neg7point13_v2.txt' ouptputting same date,  offset='-7.13' if overwrite = False: \n"+
+                         "The file with the error you inputted was formatted as: \n"+ 
+                         "    filename= '"+filename+"'") .with_traceback(sys.exc_info()[2]) 
+    
+
+def convert_to_datetimes(df:type(pd.DataFrame()), date:type(pd.to_datetime('2022')), utc_offset:np.float64):
+    """Function to read in the fractional hour output from the df, and covert it into 
+    a pandas datetime object in both local and UTC time using the input utc_offset
+    extracted from the filename. Outputs same df, with new column for 'Local_Datetime',
+    drops the 'frc_hr_UTC column', and sets the df index as 'UTC_Datetime'""" 
+
+    # Calculate the timedelta based on the offset
+    timedelta_offset = pd.Timedelta(hours=utc_offset)
+
+    # Convert fractional hours to timedelta
+    timedelta_hours = pd.to_timedelta(df['frc_hr_UTC'], unit='h')
+
+    # Combine date and timedelta hours to get time in UTC & assign to df: 
+    df['UTC_Datetime']= date + timedelta_hours 
+    
+    # Combine date, timedelta_hours, and timedelta_offset to get local time & assign to df: 
+    df['Local_Datetime']= date + timedelta_hours + timedelta_offset
+    
+    # Drop the fractional hours column from the output df: 
+    df.drop(columns='frc_hr_UTC', inplace=True)
+
+    # Set the df index to 'UTC_Datetime': 
+    df.set_index('UTC_Datetime', inplace=True)
+    
+    return df
+
+
+
 
