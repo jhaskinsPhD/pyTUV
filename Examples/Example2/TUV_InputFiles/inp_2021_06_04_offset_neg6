@@ -14,7 +14,7 @@ dirsun =       1.000   difdn =        1.000   difup =        0.000
 zout =         1.306   zaird =   -9.990E+02   ztemp =     -999.000
 lirrad =           F   laflux =           F   lmmech =           F
 lrates =           F   isfix =            0   nms =              0
-ljvals =           T   ijfix =            0   nmj =             52
+ljvals =           T   ijfix =            0   nmj =             56
 iwfix =            0   itfix =            0   izfix =            0
 ==================================================================
 ===== Avaliable spectral weighting functions:
@@ -67,8 +67,8 @@ F 17 NO3-(aq) with qy=1
 T 18 CH2O -> H + HCO                                   
 T 19 CH2O -> H2 + CO                                   
 T 20 CH3CHO -> CH3 + HCO                               
-F 21 CH3CHO -> CH4 + CO                                
-F 22 CH3CHO -> CH3CO + H                               
+T 21 CH3CHO -> CH4 + CO                                
+T 22 CH3CHO -> CH3CO + H                               
 T 23 C2H5CHO -> C2H5 + HCO                             
 T 24 CH3OOH -> CH3O + OH                               
 F 25 HOCH2OOH -> HOCH2O. + OH                          
@@ -110,7 +110,7 @@ F 60 (CH3)2NNO -> Products
 F 61 CF2O -> Products                                  
 T 62 Cl2 -> Cl + Cl                                    
 F 63 ClO -> Cl + O(1D)                                 
-F 64 ClO -> Cl + O(3P)                                 
+T 64 ClO -> Cl + O(3P)                                 
 T 65 ClOO -> Products                                  
 T 66 OClO -> Products                                  
 T 67 ClOOCl -> Cl + ClOO                               
@@ -145,7 +145,7 @@ T 95 BrO -> Br + O
 T 96 HOBr -> OH + Br                                   
 F 97 BrNO -> Br + NO                                   
 F 98 BrONO -> Br + NO2                                 
-F 99 BrONO -> BrO + NO                                 
+T 99 BrONO -> BrO + NO                                 
 F100 BrNO2 -> Br + NO2                                 
 T101 BrONO2 -> BrO + NO2                               
 T102 BrONO2 -> Br + NO3                                

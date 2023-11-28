@@ -75,7 +75,10 @@ def _parse_filename(filename, quiet:bool=True):
     # Split filename into name/ extension: 
     [path_and_name,oext] = os.path.splitext(filename)
     
-    # Split the file minus its extnsion (if it has one) into the savepath & name 
+    # Make sure extension is not still in "path_and_name" 
+    if oext in path_and_name: path_and_name=path_and_name.replace(oext, '') 
+    
+    # Split the file minus its extension (if it has one) into the savepath & name 
     opath, oname= os.path.split(path_and_name)
     
     # Print intput/ output if quiet is False: 
@@ -955,16 +958,16 @@ def convert_to_datetimes(df:type(pd.DataFrame()), date:type(pd.to_datetime('2022
     timedelta_hours = pd.to_timedelta(df['frc_hr_UTC'], unit='h')
 
     # Combine date and timedelta hours to get time in UTC & assign to df: 
-    df['UTC_Datetime']= date + timedelta_hours 
+    df['Datetime_UTC']= date + timedelta_hours 
     
     # Combine date, timedelta_hours, and timedelta_offset to get local time & assign to df: 
-    df['Local_Datetime']= date + timedelta_hours + timedelta_offset
+    df['Datetime_Local']= date + timedelta_hours + timedelta_offset
     
     # Drop the fractional hours column from the output df: 
     df.drop(columns='frc_hr_UTC', inplace=True)
 
     # Set the df index to 'UTC_Datetime': 
-    df.set_index('UTC_Datetime', inplace=True)
+    df.set_index('Datetime_UTC', inplace=True)
     
     return df
 

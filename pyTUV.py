@@ -10,6 +10,8 @@ import sys
 import csv 
 import pandas as pd 
 import numpy as np 
+from scipy.io import savemat
+from collections import OrderedDict
 
 sys.path.append('/uufs/chpc.utah.edu/common/home/u6044586/python_scripts/modules/pyTUV/')
 from utils import *
@@ -276,7 +278,7 @@ def read_single_TUV_output(outfile, map_to_MCM:bool=True):
             #   '41 = ClONO2 -> Cl + NO3'  
             if in_headers is True: 
                 col_n=line.split('=')[0].replace(' ','') # Get column # of this rxn
-                j_rxn= ''.join(line.split('=')[1:]).replace(' ','') # Get rxn without spaces! 
+                j_rxn= '='.join(line.split('=')[1:]).replace(' ','') # Get rxn without spaces! 
                 if map_to_MCM is True and j_rxn in list(j_map.keys()): 
                     map_cols[col_n]=j_map[j_rxn] # Assign col # to J## in MCM ... 
                 else: 
@@ -303,6 +305,28 @@ def read_single_TUV_output(outfile, map_to_MCM:bool=True):
     # and add columns for Local_Datetime (accounting for offset) and UTC_Datetime 
     # to the df, drop the column 'frc_hr_UTC', and set UTC_Datetime as df index! 
     df = convert_to_datetimes(df, date, utc_offset)
+    
+    # Some TUV reactions should correspond to MULTIPLE MCM J-values (seperated by a ';' )
+    # so convert columns that have multiple Js listed into SINGLE columns with Js listed 
+    # but with the same actual data/photolysis values. 
+    if map_to_MCM is True: 
+        # Figure out which data columns are mulitples.
+        multiples=[col for col in list(df.columns) if ';' in col]
+        
+        if len(multiples) > 0: 
+            new_dat=dict({})
+            for col in multiples: 
+                new_cols=col.split(';')
+                # Loop over new indv columns and add as key to dict, with value pointing to data in df! 
+                for ncol in new_cols: 
+                    new_dat[ncol]=df.loc[:,col] 
+                    
+            # Loop over dict and add new columns to df w/ same data...  
+            for ncol in list(new_dat.keys()): 
+                df[ncol]=new_dat[ncol]
+                
+            # Remove the old multiple columns. 
+            df=df.drop(columns=multiples)
     
     return df 
 
@@ -361,6 +385,123 @@ def read_n_combo_TUV_outputs(file_dir, map_to_MCM:bool=True):
     return df 
 
 
-
-
-
+def export_js_to_mat(df:type(pd.DataFrame()), outpath:str, outfile:str):
+    """Function to take a pandas DataFrame containin TUV output and save it as 
+    a MATLAB compliant strucutre within a .mat file. Useful for exporting things to 
+    use in F0AM! 
+    
+    Inputs:
+    -------
+      (1)  df       -  A pandas dataframe with vars you'd like to save to the output.mat file.    
+                
+      (2)  outpath  - STR with absolute path where you'd like to save the output.mat file
+        
+      (3)  outfile - STR with the desired name of the output .mat file (default is 'tuv.mat')
+        
+    Outputs:
+    --------
+       (1) A .mat file  saved at outpath+outfile.mat that contains all info in the input df.
+    
+    REQUIREMENTS: 
+    -------------
+       LIBRARIES:           import pandas as pd
+                            from collections import OrderedDict
+                            from scipy.io import savemat
+                                
+       CUSTOM_FUNCTIONS:    build_jmapping_dict (defined in pyTUV/utils.py) 
+                            check_filename      (defined in pyTUV/utils.py) 
+                          
+     AUTHOR: 
+     -------
+       Prof. Jessica D. Haskins    GitHub: @jhaskinsPhD  Email: jessica.haskins@utah.edu
+       
+     CHANGE LOG: 
+     ----------
+       11/28/2023    JDH Created    
+        
+    """
+    # Determine if the user has inputted keys as MCM names or as TUV rxns. 
+    using_TUV_rxns= False 
+    jmap, jmap_rev=build_jmapping_dict(only_MCM_Js= False, return_reverse=True)  
+    
+    # If any TUV reaction appears in the df columns assume they passed Js listed as TUV cols. 
+    if any([True if col.replace(' ','').replace('=','') in list(jmap.keys()) else False for col in list(df.columns)]):
+        # Figure out which rxns are in the columns and need to be renamed: 
+        ok_cols= [col for col in list(df.columns) if col in list(jmap_rev.keys()) and col != 'None']
+        bad_cols_w_MCMmatch=[col for col in list(df.columns) if col.replace(' ','') in list(jmap.keys()) and jmap[col.replace(' ','')]!='None']
+        bad_cols_wo_MCMmatch=[col for col in list(df.columns) if col not in ok_cols+bad_cols_w_MCMmatch]
+        
+        # Create dict to map the bad columns with a MCM Name to their MCM names... 
+        map_dict={col: jmap[col.replace(' ','')] for col in bad_cols_w_MCMmatch}; 
+        
+        # Map bad cols without a MCM name to "Unknown_J_n" where n= a number! 
+        for n,col in enumerate(bad_cols_wo_MCMmatch): 
+            map_dict[col]='Unknown_J_'+str(n)
+            n=n+1 
+            
+        # Create reverse dict of map_dict to keep track of which rxns these names correspond to! 
+        rev_mapdict= dict((v, k) for k, v in map_dict.items())
+        
+        # Replace the column names with their MCM J-Values or "Unknown" names...  
+        df=df.rename(columns=map_dict); 
+        using_TUV_rxns=True; 
+    
+    # Make sure all vars begin with a letter, not a number or symbol! 
+    num_dict=dict({'0': 'zero', '1':'one','2':'two','3':'three','4':'four','5':'five','6':'six',
+             '7':'seven','8':'eight','9':'nine'})
+    rename=dict({}) # Dict to hold how columns should be renamed. 
+    for nm in list(df.columns): 
+        new_nm=nm.replace(' ',''); # Remove any spaces in column name. 
+        while True: 
+            # Make sure all vars begin with a letter, not a number 
+            if new_nm[0] in list(num_dict.keys()): new_nm=num_dict[new_nm[0]]+new_nm[1:]
+            
+            # Make sure all vars begin with a letter, not a symbol
+            if new_nm[0].isalpha()==False and new_nm[0].isnumeric()==False: new_nm=new_nm[1:]
+            
+            # When you get a new name that starts with a letter, break & assign to renameing dict. 
+            if new_nm[0].isalpha()==True and len(new_nm)>0: 
+                rename[nm]=new_nm
+                break 
+            elif len(new_nm)==0:
+                raise ValueError('Could not rename var to begin with a letter without removing all chars!').with_traceback(sys.exc_info()[2])
+    
+    # Rename columns as needed in df to make sure the struct names are MATLAB compliant. 
+    df_new= df.rename(columns=rename)
+    df_new=df_new.reset_index()           
+    
+    # Make sure all columns have a unique name... 
+    seen=set() 
+    dupe_cols = [x for x in list(df_new.columns) if x in seen or seen.add(x)]    
+    if len(dupe_cols)>0: 
+        print(dupe_cols) 
+        sys.exit() 
+    
+    # Turn input dataframe into a dictionary: 
+    ddict=df_new.to_dict(orient='list')
+    
+    # Turn date columns from datetimes into strings: 
+    ddict['Datetime_Local']=[str(val) for val in ddict['Datetime_Local']]
+    ddict['Datetime_UTC']=[str(val) for val in ddict['Datetime_UTC']]
+    
+    # If user passed TUV Rxns, save the rxn label in a nested dict(becomes nested stuct): 
+    if using_TUV_rxns==True: 
+        ndict=dict()
+        for name in list(ddict.keys()): 
+            jvalues=ddict[name]
+            ndict[name]=dict({'Jvalues': jvalues, 'TUV_Rxn': rev_mapdict[name]})
+        ddict=ndict; 
+    
+    # Sort items alphabetically so they appear in alphabetical order in the matlab struc! 
+    odict= OrderedDict(sorted(ddict.items()))
+    
+    # Make sure output path exists / is named correctly w/ right extension. 
+    filename= outpath+outfile+'.mat'
+    filename= check_filename(filename=filename, default_name='tuv', ext='.mat', 
+                       savepath=outpath, overwrite=True, return_full=True)
+        
+    # Save it and tell themm where!
+    savemat(filename,{'tuv': odict})
+    print('Output MATLAB file saved at: ', filename)
+    
+    return odict

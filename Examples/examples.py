@@ -81,7 +81,7 @@ def example1b_read_single_output(output_file:str =''):
    
     # Now we will call the function that reads in the output file. TUV Output Files 
     # are stored with fractional_UTC_hour and TUV_rxns as column headers. Our function 
-    # converts this back to Local_Datetimes (using the date & UTC offset) and has the 
+    # converts this back to Datetime_Locals (using the date & UTC offset) and has the 
     # ability to map the TUV reactions to their MCM J-value name if map_to_MCM is set to True. 
     # We will do both & plot the (identical output) so you can see the differences! 
         
@@ -101,8 +101,8 @@ def example1b_read_single_output(output_file:str =''):
     
     # Now let's plot & compare the output of the two dataframes for this rxn/Jname... Their values should be the same! 
     fig, ax1 = plt.subplots(nrows=1,ncols=1,figsize=(14, 5)) 
-    ax1.plot(df_MCMnames['Local_Datetime'], df_MCMnames[MCM_name], color='r', marker='o',label=MCM_name)
-    ax1.plot(df_TUVrxns['Local_Datetime'], df_TUVrxns[TUV_rxn], color='b', marker='.',label=TUV_rxn)
+    ax1.plot(df_MCMnames['Datetime_Local'], df_MCMnames[MCM_name], color='r', marker='o',label=MCM_name)
+    ax1.plot(df_TUVrxns['Datetime_Local'], df_TUVrxns[TUV_rxn], color='b', marker='.',label=TUV_rxn)
     
     # Format labels, ticks, etc. 
     ax1.set_xlabel('Local Date & Time'); ax1.set_ylabel(r'Photolysis Frequency ($s^{-1}$)')
@@ -112,9 +112,13 @@ def example1b_read_single_output(output_file:str =''):
     ax1.minorticks_on(); plt.xticks(rotation=30, ha='right'); ax1.tick_params(which='major', length=5, width=2)
     ax1.legend(); plt.tight_layout(); plt.grid(); plt.show() 
     
+    # Now suppose you wanted to export this data into a .mat file to use in F0AM? 
+    # you can do that by calling this function from pyTUV.py which will export the 
+    # df into a matlab struct stored in a .mat file! 
+    export_js_to_mat(df_MCMnames, outpath=out_savepath, outfile='tuv_output')
+        
     return df_MCMnames, df_TUVrxns
     
-
 #------------------------------------------------------------------------------
 # Example #2a  Make several new input TUV files over a range of dates at same lat/lon: 
 #------------------------------------------------------------------------------
@@ -172,7 +176,7 @@ def example2b_read_daterange_input(output_dir:str=''):
     
     # Now we will call the function that reads in all the the output files stored 
     # under the output_dir. TUV Output Files are stored with fractional_UTC_hour and 
-    # TUV_rxns as column headers. Our function converts this back to Local_Datetimes 
+    # TUV_rxns as column headers. Our function converts this back to Datetime_Locals 
     # (using the date & UTC offset), concatenates all the data from ALL FILES into a single df, 
     # and has the ability to map the TUV reactions to their MCM J-value name if map_to_MCM is 
     # set to True. We will do both & plot the (identical output) so you can see the differences! 
@@ -193,11 +197,11 @@ def example2b_read_daterange_input(output_dir:str=''):
     
     # Now let's plot & compare the output of the two dataframes for this rxn/Jname... Their values should be the same! 
     fig, ax1 = plt.subplots(nrows=1,ncols=1,figsize=(14, 5)) 
-    ax1.plot(df_MCMnames['Local_Datetime'], df_MCMnames[MCM_name], color='r', marker='o',label=MCM_name)
-    ax1.plot(df_TUVrxns['Local_Datetime'], df_TUVrxns[TUV_rxn], color='b', marker='.',label=TUV_rxn)
+    ax1.plot(df_MCMnames['Datetime_Local'], df_MCMnames[MCM_name], color='r', marker='o',label=MCM_name)
+    ax1.plot(df_TUVrxns['Datetime_Local'], df_TUVrxns[TUV_rxn], color='b', marker='.',label=TUV_rxn)
     
     # Format labels, ticks, etc. 
-    ax1.set_xlim([min(df_MCMnames['Local_Datetime']), max(df_MCMnames['Local_Datetime'])])
+    ax1.set_xlim([min(df_MCMnames['Datetime_Local']), max(df_MCMnames['Datetime_Local'])])
     ax1.set_xlabel('Local Date & Time'); ax1.set_ylabel(r'Photolysis Frequency ($s^{-1}$)')
     ax1.xaxis.set_major_formatter(mdates.DateFormatter('%D %I%p')) # Tells it how to display the date/ hours
     ax1.xaxis.set_major_locator(mdates.HourLocator(interval=6)) # plots a major tick each 2 hours
@@ -205,7 +209,13 @@ def example2b_read_daterange_input(output_dir:str=''):
     ax1.minorticks_on(); plt.xticks(rotation=30, ha='right'); ax1.tick_params(which='major', length=5, width=2)
     ax1.legend(); plt.tight_layout(); plt.grid(); plt.show() 
     
+    # Now suppose you wanted to export this data into a .mat file to use in F0AM? 
+    # you can do that by calling this function from pyTUV.py which will export the 
+    # df into a matlab struct stored in a .mat file! 
+    export_js_to_mat(df_MCMnames, outpath=output_dir, outfile='tuv_output')
+    
     return df_MCMnames, df_TUVrxns
+
 #------------------------------------------------------------------------------
 # Example #3  Example of FULL DATA FLOW for HASKINS-GROUP users at UUtah 
 #             (including running TUV using bash script, run_TUV_batch.sh). 
@@ -303,7 +313,7 @@ def Haskins_Group_FULL_Example():
          
     # Now we will call the function that reads in the output file. TUV Output Files 
     # are stored with fractional_UTC_hour and TUV_rxns as column headers. Our function 
-    # converts this back to Local_Datetimes (using the date & UTC offset) and has the 
+    # converts this back to Datetime_Locals (using the date & UTC offset) and has the 
     # ability to map the TUV reactions to their MCM J-value name if map_to_MCM is set to True. 
     # We will do both & plot the (identical output) so you can see the differences! 
     
@@ -324,8 +334,8 @@ def Haskins_Group_FULL_Example():
     # Now let's plot & compare the output of the two dataframes for this rxn/Jname... Their values should be the same! 
     fig, ax1 = plt.subplots(nrows=1,ncols=1,figsize=(14, 5)) 
     
-    ax1.plot(df_MCMnames['Local_Datetime'], df_MCMnames[MCM_name], color='r', marker='o',label=MCM_name)
-    ax1.plot(df_TUVrxns['Local_Datetime'], df_TUVrxns[TUV_rxn], color='b', marker='.',label=TUV_rxn)
+    ax1.plot(df_MCMnames['Datetime_Local'], df_MCMnames[MCM_name], color='r', marker='o',label=MCM_name)
+    ax1.plot(df_TUVrxns['Datetime_Local'], df_TUVrxns[TUV_rxn], color='b', marker='.',label=TUV_rxn)
     
     # Format labels, ticks, etc. 
     ax1.set_xlabel('Local Date & Time'); ax1.set_ylabel(r'Photolysis Frequency ($s^{-1}$)')
@@ -335,4 +345,12 @@ def Haskins_Group_FULL_Example():
     ax1.minorticks_on(); plt.xticks(rotation=30, ha='right'); ax1.tick_params(which='major', length=5, width=2)
     ax1.legend(); plt.tight_layout(); plt.grid(); plt.show() 
     
+    # Now suppose you wanted to export this data into a .mat file to use in F0AM? 
+    # you can do that by calling this function from pyTUV.py which will export the 
+    # df into a matlab struct stored in a .mat file! 
+    out_savepath=paths['Example1_Outputs'] # Should point to '.../pyTUV/Examples/Example1/TUV_OutputFiles/'
+    export_js_to_mat(df_MCMnames, outpath=out_savepath, outfile='tuv_output')
+    
     return df_MCMnames, df_TUVrxns
+
+
